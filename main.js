@@ -27,7 +27,7 @@ function setupEvents() {
   tray.on('click', handleMenuClick)
 }
 
-function setupTray() {
+function setupTray(icon) {
   tray = new Tray(icon)
 }
 
