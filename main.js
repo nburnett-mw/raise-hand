@@ -14,7 +14,7 @@ function setupApplication() {
 
   // Setup the menubar with an icon
   let icon = nativeImage.createFromDataURL(base64Icon)
-  
+
   setupTray(icon)
   setupWindow()
   setupEvents()
@@ -25,6 +25,20 @@ function setupEvents() {
   // Add a click handler so that when the user clicks on the menubar icon, it shows
   // our popup window
   tray.on('click', handleMenuClick)
+
+  // ipc events
+  ipcMain.on('show-window', () => {
+    showWindow()
+  })
+
+  // app events
+  app.on('window-all-closed', () => {
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
 }
 
 function setupTray(icon) {
@@ -49,32 +63,39 @@ function setupWindow() {
 }
 
 function handleWindowBlur() {
-  if (!window.webContents.isDevToolsOpened()) {
-    window.hide()
+  const { webContents, hide } = window
+
+  if (!webContents.isDevToolsOpened()) {
+    hide()
   }
 }
 
 function handleMenuClick(event) {
+  const { isVisible, openDevTools } = window
   toggleWindow()
 
   // Show devtools when command clicked
-  if (window.isVisible() && process.defaultApp && event.metaKey) {
-    window.openDevTools({ mode: 'detach' })
+  if (isVisible() && process.defaultApp && event.metaKey) {
+    openDevTools({ mode: 'detach' })
   }
 }
 
 const toggleWindow = () => {
-  if (window.isVisible()) {
-    window.hide()
+  const { isVisible, hide } = window
+
+  if (isVisible()) {
+    hide()
   } else {
     showWindow()
   }
 }
 
-const showWindow = () => {
+function showWindow() {
+  const { setPosition, show, focus} = window
   const trayPos = tray.getBounds()
   const windowPos = window.getBounds()
   let x, y = 0
+
   if (process.platform == 'darwin') {
     x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
     y = Math.round(trayPos.y + trayPos.height)
@@ -84,22 +105,10 @@ const showWindow = () => {
   }
 
 
-  window.setPosition(x, y, false)
-  window.show()
-  window.focus()
+  setPosition(x, y, false)
+  show()
+  focus()
 }
-
-ipcMain.on('show-window', () => {
-  showWindow()
-})
-
-app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
 
 // Tray Icon as Base64 so tutorial has less overhead
 let base64Icon = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw
