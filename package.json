@@ -1,0 +1,26 @@
+{
+  "name": "raise-hand",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nburnett-mw/raise-hand.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nburnett-mw/raise-hand/issues"
+  },
+  "homepage": "https://github.com/nburnett-mw/raise-hand#readme",
+  "dependencies": {
+    "electron": "^4.0.3"
+  },
+  "devDependencies": {
+    "electron-packager": "^13.0.1",
+    "electron-prebuilt": "^1.4.13"
+  }
+}
